@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel
 from sympy import E, exp, log, latex, symbols, sqrt, cosh, sinh, tanh, cos, sin, tan, asinh, acosh, acos, atanh, asin, \
-    atan
+    atan, simplify
 from sympy.core.numbers import One, pi, Zero
 
 from Sigmoid import sigmoid
@@ -36,6 +36,7 @@ class TaskWidget(QWidget):
         cos(X),
         sin(X),
         tan(X),
+
         asinh(X),
         acosh(X),
         acos(X),
@@ -71,7 +72,10 @@ class TaskWidget(QWidget):
     def updateTask(self):
         from LatexRenderer import latexRenderer
         task = self.TASKS[self.currentTaskIndex]
-        self.taskLabel.setPixmap(latexRenderer.latexToPixmap(latex(task), 40))
+        try:
+            self.taskLabel.setPixmap(latexRenderer.latexToPixmap(latex(task), 40))
+        except:
+            self.taskLabel.setText(str(task))
 
     def setCurrentTaskIndex(self, currentTaskIndex):
         self.currentTaskIndex = currentTaskIndex

@@ -1,6 +1,6 @@
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QScrollArea, QSizePolicy
-from sympy import expand
+from sympy import expand, simplify, symbols
 
 from ExpressionSlotWidget import ExpressionSlotWidget
 from ExpressionWidget import ExpressionWidget
@@ -58,9 +58,33 @@ class SynthesisWidget(QWidget):
                 break
 
     def onSynthesizeButtonClicked(self):
-        expression = self.expressionSlotWidget.evaluate()
-        expression = expand(expression, force=True)
-        self.resultExpressionWidget.setExpression(expression)
-        if expression.is_Symbol:
+        replaceInfo = {}  # { x: (x', [widget, ...]), ... }
+        def callback(expressionSlotWidget, expressionWidget):
+            if expressionSlotWidget is self.expressionSlotWidget:
+                return True
+            if expressionWidget is None:
+                return True
+            expression = expressionWidget.expression
+            if expression.is_Symbol:
+                if expression not in replaceInfo:
+                    tempSymbol = symbols(expression.name + "'")
+                    widgets = []
+                    replaceInfo[expression] = tempSymbol, widgets
+                else:
+                    tempSymbol, widgets = replaceInfo[expression]
+                expressionWidget.expression = tempSymbol
+                widgets.append(expressionWidget)
+            return True
+
+        self.expressionSlotWidget.iterateExpressionWidgetsRecursively(callback)
+        evaluatedExpression = self.expressionSlotWidget.evaluate()
+
+        for expression, (tempSymbol, widgets) in replaceInfo.items():
+            for widget in widgets:
+                widget.expression = expression
+            evaluatedExpression = evaluatedExpression.subs(tempSymbol, expression)
+        evaluatedExpression = simplify(expand(evaluatedExpression, force=True), force=True)
+        self.resultExpressionWidget.setExpression(evaluatedExpression)
+        if evaluatedExpression.is_Symbol:
             return
-        self.SIGNAL_EXPRESSION_FOUND.emit(expression)
+        self.SIGNAL_EXPRESSION_FOUND.emit(evaluatedExpression)
