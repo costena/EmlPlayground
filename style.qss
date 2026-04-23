@@ -1,0 +1,26 @@
+ExpressionWidget {
+    border-radius: 10px;
+    background-color: white;
+}
+
+ExpressionWidget[symbolCount="-1"] {
+    background-color: gray;
+}
+
+ExpressionWidget[symbolCount="0"] {
+    background-color: lightblue;
+}
+
+ExpressionWidget[symbolCount="1"] {
+    background-color: lightgreen;
+}
+
+ExpressionWidget[symbolCount="2"] {
+    background-color: pink;
+}
+
+ExpressionSlotWidget {
+    border: 1px dashed black;
+    border-radius: 10px;
+    background-color: white;
+}
