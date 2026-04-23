@@ -1,5 +1,6 @@
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QScrollArea, QSizePolicy
+from sympy import expand
 
 from ExpressionSlotWidget import ExpressionSlotWidget
 from ExpressionWidget import ExpressionWidget
@@ -58,5 +59,8 @@ class SynthesisWidget(QWidget):
 
     def onSynthesizeButtonClicked(self):
         expression = self.expressionSlotWidget.evaluate()
-        self.SIGNAL_EXPRESSION_FOUND.emit(expression)
+        expression = expand(expression, force=True)
         self.resultExpressionWidget.setExpression(expression)
+        if expression.is_Symbol:
+            return
+        self.SIGNAL_EXPRESSION_FOUND.emit(expression)

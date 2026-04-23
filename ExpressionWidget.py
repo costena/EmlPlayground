@@ -12,6 +12,7 @@ from ExpressionSlotWidget import ExpressionSlotWidget
 
 class ExpressionWidget(QFrame):
     SIGNAL_MODIFIED = pyqtSignal()
+    SIGNAL_DELETE_REQUESTED = pyqtSignal()
 
     def __init__(self, parent=None):
         super(ExpressionWidget, self).__init__(parent)
@@ -54,7 +55,6 @@ class ExpressionWidget(QFrame):
         for symbol in sorted(self.expression.free_symbols, key=lambda x: x.name):
             label = QLabel(self)
             label.setPixmap(self.latexToPixmap(latex(symbol) + "=", self.font().pointSize()))
-            # self.addArgWidget(QLabel(str(symbol) + "=", self))
             self.addArgWidget(label)
             self.addExpressionSlotWidget(symbol, ExpressionSlotWidget(self))
 
@@ -72,7 +72,7 @@ class ExpressionWidget(QFrame):
 
     def addArgWidget(self, widget):
         self.argWidgets.append(widget)
-        self.layout_.addWidget(widget)
+        self.layout_.addWidget(widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def mouseMoveEvent(self, event):
         super(ExpressionWidget, self).mouseMoveEvent(event)
@@ -107,3 +107,7 @@ class ExpressionWidget(QFrame):
             if not expressionSlotWidget.iterateExpressionWidgetsRecursively(callback):
                 return False
         return True
+
+    def mousePressEvent(self, event):
+        if event.buttons() == Qt.MouseButton.RightButton:
+            self.SIGNAL_DELETE_REQUESTED.emit()

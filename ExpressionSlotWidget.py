@@ -33,10 +33,6 @@ class ExpressionSlotWidget(QFrame):
             expressionWidget.setInteractable(True)
         self.setExpressionWidget(expressionWidget)
 
-    def mousePressEvent(self, event):
-        if event.buttons() == Qt.MouseButton.RightButton:
-            self.setExpressionWidget(None)
-
     def setExpressionWidget(self, expressionWidget):
         if self.expressionWidget is not None:
             self.layout_.removeWidget(self.expressionWidget)
@@ -45,6 +41,7 @@ class ExpressionSlotWidget(QFrame):
         if self.expressionWidget is not None:
             self.layout_.addWidget(self.expressionWidget)
             self.expressionWidget.SIGNAL_MODIFIED.connect(self.SIGNAL_MODIFIED)
+            self.expressionWidget.SIGNAL_DELETE_REQUESTED.connect(lambda: self.setExpressionWidget(None))
         self.SIGNAL_MODIFIED.emit()
 
     def isAllFilled(self):

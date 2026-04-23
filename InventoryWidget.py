@@ -1,3 +1,5 @@
+from functools import partial
+
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QLabel, QHBoxLayout, QSizePolicy, QFrame
 from sympy import symbols
@@ -36,3 +38,22 @@ class InventoryWidget(QScrollArea):
 
     def addExpressionWidget(self, expressionWidget):
         self.contentLayout.addWidget(expressionWidget, alignment=Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        expressionWidget.SIGNAL_DELETE_REQUESTED.connect(lambda: self.removeExpressionWidget(expressionWidget))
+
+    def removeExpressionWidget(self, expressionWidget):
+        expression = expressionWidget.expression
+        if expression not in self.expressions:
+            return
+        self.expressions.remove(expression)
+        self.contentLayout.removeWidget(expressionWidget)
+        expressionWidget.deleteLater()
+
+    def dump(self):
+        return {
+            'expressions': list(self.expressions),
+        }
+
+    def load(self, data):
+        expressions = data['expressions']
+        for expression in expressions:
+            self.addExpression(expression)

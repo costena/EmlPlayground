@@ -1,5 +1,6 @@
 import sys
 
+from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QApplication
 
@@ -16,6 +17,7 @@ def main():
     emlPlayground = EmlPlaygroundWidget()
     emlPlayground.show()
     app.exec()
+    emlPlayground.dump()
 
 
 if __name__ == '__main__':
